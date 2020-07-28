@@ -70,7 +70,14 @@ struct AnimatedImageView : View {
 	@ObservedObject
 	private	var	frameIndex :FrameIndex
 
-			var	body :some View { self.images[self.frameIndex.value % self.images.count] }
+			var	body :some View {
+						GeometryReader { geometry in
+							self.images[self.frameIndex.value % self.images.count]
+								.resizable()
+								.aspectRatio(contentMode: .fit)
+								.frame(width: geometry.size.width, height: geometry.size.height)
+						}
+					}
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
