@@ -13,10 +13,21 @@ import SwiftUI
 struct RoundedCornersShape : Shape {
 
 	// MARK: Properties
-	var topLeftRadius: CGFloat = 0.0
-	var topRightRadius: CGFloat = 0.0
-	var bottomLeftRadius: CGFloat = 0.0
-	var bottomRightRadius: CGFloat = 0.0
+	private	let topLeftRadius: CGFloat
+	private	let topRightRadius: CGFloat
+	private	let bottomLeftRadius: CGFloat
+	private	let bottomRightRadius: CGFloat
+
+	// MARK: Lifecycle methods
+	//------------------------------------------------------------------------------------------------------------------
+	init(topLeftRadius :CGFloat = 0.0, topRightRadius :CGFloat = 0.0, bottomLeftRadius :CGFloat = 0.0,
+			bottomRightRadius :CGFloat = 0.0) {
+		// Store
+		self.topLeftRadius = topLeftRadius
+		self.topRightRadius = topRightRadius
+		self.bottomLeftRadius = bottomLeftRadius
+		self.bottomRightRadius = bottomRightRadius
+	}
 
 	// MARK: Shape methods
 	//------------------------------------------------------------------------------------------------------------------
