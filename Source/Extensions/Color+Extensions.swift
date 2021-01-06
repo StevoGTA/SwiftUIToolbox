@@ -1,8 +1,9 @@
 //
 //  Color+Extensions.swift
-//  Crowd Noise
+//  SwiftUI Toolbox
 //
 //  Created by Stevo on 11/2/20.
+//  Copyright © 2020 Stevo Brock. All rights reserved.
 //
 
 import SwiftUI
