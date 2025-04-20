@@ -74,7 +74,6 @@ struct ToggleableListSheet : View {
 	//------------------------------------------------------------------------------------------------------------------
 	private func update(toggleable :Toggleable, to isActive :Bool) {
 		// Update
-NSLog("isActive: \(isActive)")
 		self.isActives[self.toggleables.firstIndex(where: { $0 === toggleable })!] = isActive
 	}
 
