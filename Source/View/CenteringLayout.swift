@@ -1,5 +1,5 @@
 //
-//  CenteringView.swift
+//  CenteringLayout.swift
 //  SwiftUI Toolbox
 //
 //  Created by Stevo on 12/1/25.
@@ -9,8 +9,8 @@
 import SwiftUI
 
 //----------------------------------------------------------------------------------------------------------------------
-// MARK: CenteringView
-struct CenteringView<Content: View> : View {
+// MARK: CenteringLayout
+struct CenteringLayout<Content: View> : View {
 
 	// MARK: Properties
 			var	body :some View {
