@@ -19,8 +19,7 @@ struct ToggleableListSheet : View {
 	// MARK: Properties
 			var	body :some View {
 								NavigationView {
-									ToggleableList(self.toggleables, toggleControl: self.toggleControl,
-												   updateProc: { self.update(toggleable: $0, to: $1) })
+									ToggleableList(self.toggleableWrappers, togglePlacement: self.togglePlacement)
 										.navigationBarTitle(self.title, displayMode: .inline)
 											.font(.system(size: 16, weight: .medium, design: .rounded))
 										.if({ self.cancelProc != nil }()) { view in
@@ -38,8 +37,8 @@ struct ToggleableListSheet : View {
 							}
 
 	private	let	title :String
-	private	let	toggleables :[Toggleable]
-	private	let	toggleControl :ToggleableView.ToggleControl
+	private	let	toggleableWrappers :[ToggleableWrapper]
+	private	let	togglePlacement :ToggleableView.TogglePlacement
 
 	private	let	confirmButtonTitle :String
 	private	let	confirmProc :ConfirmProc
@@ -53,13 +52,13 @@ struct ToggleableListSheet : View {
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
 	init(_ title :String, toggleables :[Toggleable],
-			toggleControl :ToggleableView.ToggleControl = ToggleableView.ToggleControl.default,
+			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default,
 			confirmButtonTitle :String = "Confirm", confirmProc :@escaping ConfirmProc,
 			cancelButtonTitle :String = "Cancel", cancelProc :CancelProc? = nil) {
 		// Store
 		self.title = title
-		self.toggleables = toggleables
-		self.toggleControl = toggleControl
+		self.toggleableWrappers = toggleables.map({ ToggleableWrapper($0) })
+		self.togglePlacement = togglePlacement
 
 		self.confirmButtonTitle = confirmButtonTitle
 		self.confirmProc = confirmProc
@@ -72,15 +71,9 @@ struct ToggleableListSheet : View {
 
 	// MARK: Private methods
 	//------------------------------------------------------------------------------------------------------------------
-	private func update(toggleable :Toggleable, to isActive :Bool) {
-		// Update
-		self.isActives[self.toggleables.firstIndex(where: { $0 === toggleable })!] = isActive
-	}
-
-	//------------------------------------------------------------------------------------------------------------------
 	private func confirm() {
 		// Update toggleables
-		self.toggleables.enumerated().forEach() { $0.element.isActive = self.isActives[$0.offset] }
+		self.toggleableWrappers.forEach({ $0.toggleable.isActive = $0.isActive })
 
 		// Call proc
 		self.confirmProc()
@@ -105,7 +98,7 @@ struct ToggleableListSheet_Previews : PreviewProvider {
 	static	var previews :some View {
 						VStack {
 							ToggleableListSheet("Title", toggleables: self.toggleables,
-									toggleControl: .trailingCheckmarkCircle, confirmProc: {})
+									togglePlacement: .trailingCheckmarkCircle, confirmProc: {})
 						}
 					}
 }

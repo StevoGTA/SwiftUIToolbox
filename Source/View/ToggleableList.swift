@@ -14,26 +14,74 @@ struct ToggleableList : View {
 
 	// MARK: Properties
 			var	body :some View {
-								List(self.toggleables) {
-									ToggleableView($0, toggleControl: self.toggleControl,
-											updateProc: self.updateProc)
+								List(self.toggleableWrappers) {
+									ToggleableView($0, togglePlacement: self.togglePlacement,
+											updateProc: { self.updateUI() })
 								}
+									.contentMargins(.top, 0)
+									.safeAreaInset(edge: .top) {
+										HStack {
+											Spacer()
+
+											Button("None") { selectNone() }
+												.disabled(!self.noneButtonEnabled)
+												.padding()
+
+											Button("All") { selectAll() }
+												.disabled(!self.allButtonEnabled)
+												.padding()
+
+											Spacer()
+										}
+									}
 							}
 
-	private	let	toggleables :[Toggleable]
-	private	let	toggleControl :ToggleableView.ToggleControl
+	private	let	toggleableWrappers :[ToggleableWrapper]
+	private	let	togglePlacement :ToggleableView.TogglePlacement
 
-	private	let	updateProc :ToggleableView.UpdateProc?
+	@State
+	private	var	noneButtonEnabled = true
+
+	@State
+	private	var	allButtonEnabled = true
+
+	// MARK: Lifecycle methods
+	//------------------------------------------------------------------------------------------------------------------
+	init(_ toggleableWrappers :[ToggleableWrapper],
+			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default) {
+		// Store
+		self.toggleableWrappers = toggleableWrappers
+		self.togglePlacement = togglePlacement
+
+		// Update UI
+		self._noneButtonEnabled = State(initialValue: self.toggleableWrappers.first(where: { $0.isActive }) != nil)
+		self._allButtonEnabled = State(initialValue: self.toggleableWrappers.first(where: { !$0.isActive }) != nil)
+	}
+
+	// MARK: Private methods
+	//------------------------------------------------------------------------------------------------------------------
+	private func selectAll() {
+		// Update
+		self.toggleableWrappers.forEach() { $0.isActive = true }
+
+		// Update UI
+		updateUI()
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleables :[Toggleable],
-			toggleControl :ToggleableView.ToggleControl = ToggleableView.ToggleControl.default,
-			updateProc :ToggleableView.UpdateProc? = nil) {
-		// Store
-		self.toggleables = toggleables
-		self.toggleControl = toggleControl
+	private func selectNone() {
+		// Update
+		self.toggleableWrappers.forEach() { $0.isActive = false }
 
-		self.updateProc = updateProc
+		// Update UI
+		updateUI()
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	private func updateUI() {
+		// Update UI
+		self.noneButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
+		self.allButtonEnabled = self.toggleableWrappers.first(where: { !$0.isActive }) != nil
 	}
 }
 
@@ -44,17 +92,17 @@ struct ToggleableList_Previews : PreviewProvider {
 	// MARK: Properties
 	static	let	toggleables =
 					[
-						Toggleable(title: "One", isActive: true),
-						Toggleable(title: "Two", isActive: false),
-						Toggleable(title: "Three", isActive: true),
-						Toggleable(title: "Four", isActive: false),
-						Toggleable(title: "Five", isActive: true),
-						Toggleable(title: "Six", isActive: false),
+						ToggleableWrapper(Toggleable(title: "One", isActive: true)),
+						ToggleableWrapper(Toggleable(title: "Two", isActive: false)),
+						ToggleableWrapper(Toggleable(title: "Three", isActive: true)),
+						ToggleableWrapper(Toggleable(title: "Four", isActive: false)),
+						ToggleableWrapper(Toggleable(title: "Five", isActive: true)),
+						ToggleableWrapper(Toggleable(title: "Six", isActive: false)),
 					]
 
 	static	var previews :some View {
 						VStack {
-							ToggleableList(self.toggleables, toggleControl: .trailingCheckmarkCircle)
+							ToggleableList(self.toggleables, togglePlacement: .trailingCheckmarkCircle)
 						}
 					}
 }

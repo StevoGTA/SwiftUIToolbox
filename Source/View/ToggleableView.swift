@@ -12,8 +12,8 @@ import SwiftUI
 // MARK: ToggleableView
 struct ToggleableView : View {
 
-	// MARK: ToggleControl
-	enum ToggleControl {
+	// MARK: TogglePlacement
+	enum TogglePlacement {
 		// Values
 		case leadingToggle
 		case trailingToggle
@@ -25,46 +25,47 @@ struct ToggleableView : View {
 		case trailingCheckmarkCircle
 
 		// Properties
-		static	let	`default` = ToggleControl.trailingToggle
+		static	let	`default` = TogglePlacement.trailingToggle
 	}
 
 	// MARK: Procs
-	typealias UpdateProc = (_ toggleable :Toggleable, _ isActive :Bool) -> Void
+	typealias UpdateProc = () -> Void
 
 	// MARK: Properties
 			var	body :some View {
 								HStack {
-									// Leading controls
-									if self.toggleControl == .leadingToggle {
+									// Leading placements
+									if self.togglePlacement == .leadingToggle {
 										// Toggle
-										Toggle("", isOn: self.$isActive)
+										Toggle("", isOn: self.$toggleableWrapper.isActive)
 											.fixedSize()
-											.onChange(of: self.isActive) { self.updateProc(self.toggleable, $1) }
+											.onChange(of: self.toggleableWrapper.isActive) { self.updateProc() }
 										Spacer()
-									} else if self.toggleControl == .leadingCheckmark {
+									} else if self.togglePlacement == .leadingCheckmark {
 										// Checkmark
 										self.imageView
 										Spacer()
-									} else if self.toggleControl == .leadingCheckmarkCircle {
+									} else if self.togglePlacement == .leadingCheckmarkCircle {
 										// Checkmark Circle
 										self.imageView
 										Spacer()
 									}
 
 									// Text
-									Text("\(String(self.toggleable.title))")
+									Text("\(String(self.toggleableWrapper.toggleable.title))")
 
-									// Trailing controls
-									if self.toggleControl == .trailingToggle {
+									// Trailing placements
+									if self.togglePlacement == .trailingToggle {
 										// Toggle
 										Spacer()
-										Toggle("", isOn: self.$isActive)
-											.onChange(of: self.isActive) { self.updateProc(self.toggleable, $1) }
-									} else if self.toggleControl == .trailingCheckmark {
+										Toggle("", isOn: self.$toggleableWrapper.isActive)
+											.fixedSize()
+											.onChange(of: self.toggleableWrapper.isActive) { self.updateProc() }
+									} else if self.togglePlacement == .trailingCheckmark {
 										// Checkmark
 										Spacer()
 										self.imageView
-									} else if self.toggleControl == .trailingCheckmarkCircle {
+									} else if self.togglePlacement == .trailingCheckmarkCircle {
 										// Checkmark Circle
 										Spacer()
 										self.imageView
@@ -73,63 +74,59 @@ struct ToggleableView : View {
 									.contentShape(Rectangle())
 									.onTapGesture {
 										// Toggle local state
-										self.isActive.toggle()
+										self.toggleableWrapper.isActive.toggle()
 
 										// Call proc
-										self.updateProc(self.toggleable, self.isActive)
+										self.updateProc()
 									}
 							}
 
-	private	let	toggleable :Toggleable
-	private	let	toggleControl :ToggleControl
+	@ObservedObject
+	private	var	toggleableWrapper :ToggleableWrapper
+
+	private	let	togglePlacement :TogglePlacement
 
 	private	let	updateProc :UpdateProc
 
 	private	var	imageView :some View {
 					ZStack {
 						// Check toggle control
-						if (self.toggleControl == .leadingCheckmark) ||
-								(self.toggleControl == .trailingCheckmark) {
+						if (self.togglePlacement == .leadingCheckmark) ||
+								(self.togglePlacement == .trailingCheckmark) {
 							// Check mark
-							if self.isActive {
+							if self.toggleableWrapper.isActive {
 								// Currently active
 								Image(systemName: "checkmark")
 									.foregroundColor(.accentColor)
 							} else {
 								// Currently inactive
 								Image(systemName: "checkmark")
-									.opacity(0.25)
+									.opacity(0.10)
 							}
 						} else {
 							// Checkmark circle
-							if self.isActive {
+							if self.toggleableWrapper.isActive {
 								// Currently active
 								Image(systemName: "checkmark.circle")
 									.foregroundColor(.accentColor)
 							} else {
 								// Currently inactive
 								Image(systemName: "checkmark.circle")
-									.opacity(0.25)
+									.opacity(0.10)
 							}
 						}
 					}
 				}
 
-	@State
-	private	var	isActive :Bool
-
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleable :Toggleable, toggleControl :ToggleControl = ToggleControl.default,
+	init(_ toggleableWrapper :ToggleableWrapper, togglePlacement :TogglePlacement = TogglePlacement.default,
 			updateProc :UpdateProc? = nil) {
 		// Store
-		self.toggleable = toggleable
-		self.toggleControl = toggleControl
+		self.toggleableWrapper = toggleableWrapper
+		self.togglePlacement = togglePlacement
 
-		self.updateProc = updateProc ?? { $0.isActive = $1 }
-
-		// Setup
-		self.isActive = toggleable.isActive
+		self.updateProc = updateProc ?? {}
 	}
 }
 
@@ -138,16 +135,25 @@ struct ToggleableView : View {
 struct ToggleableView_Previews : PreviewProvider {
 
 	// MARK: Properties
-	static	let	toggleable = Toggleable(title: "Sample", isActive: true)
+	static	let	toggleableWrappers :[ToggleableWrapper] =
+					[
+						ToggleableWrapper(Toggleable(title: "Sample 1", isActive: false)),
+						ToggleableWrapper(Toggleable(title: "Sample 2", isActive: true)),
+						ToggleableWrapper(Toggleable(title: "Sample 3", isActive: false)),
+						ToggleableWrapper(Toggleable(title: "Sample 4", isActive: true)),
+						ToggleableWrapper(Toggleable(title: "Sample 5", isActive: false)),
+						ToggleableWrapper(Toggleable(title: "Sample 6", isActive: true)),
+					]
 
 	static	var previews :some View {
-						VStack {
-							ToggleableView(self.toggleable, toggleControl: .leadingToggle)
-							ToggleableView(self.toggleable, toggleControl: .trailingToggle)
-							ToggleableView(self.toggleable, toggleControl: .leadingCheckmark)
-							ToggleableView(self.toggleable, toggleControl: .trailingCheckmark)
-							ToggleableView(self.toggleable, toggleControl: .leadingCheckmarkCircle)
-							ToggleableView(self.toggleable, toggleControl: .trailingCheckmarkCircle)
+						List {
+							ToggleableView(self.toggleableWrappers[0], togglePlacement: .leadingToggle)
+							ToggleableView(self.toggleableWrappers[1], togglePlacement: .trailingToggle)
+							ToggleableView(self.toggleableWrappers[2], togglePlacement: .leadingCheckmark)
+							ToggleableView(self.toggleableWrappers[3], togglePlacement: .trailingCheckmark)
+							ToggleableView(self.toggleableWrappers[4], togglePlacement: .leadingCheckmarkCircle)
+							ToggleableView(self.toggleableWrappers[5], togglePlacement: .trailingCheckmarkCircle)
 						}
+							.padding()
 					}
 }
