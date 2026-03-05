@@ -1,16 +1,16 @@
 //
-//  ToggleableListSheet.swift
+//  ToggleableGridSheet.swift
 //  SwiftUI Toolbox
 //
-//  Created by Stevo Brock on 3/15/25.
-//  Copyright © 2025 Stevo Brock. All rights reserved.
+//  Created by Stevo Brock on 3/5/25.
+//  Copyright © 2026 Stevo Brock. All rights reserved.
 //
 
 import SwiftUI
 
 //----------------------------------------------------------------------------------------------------------------------
-// MARK: ToggleableListSheet
-struct ToggleableListSheet : View {
+// MARK: ToggleableGridSheet
+struct ToggleableGridSheet : View {
 
 	// MARK: Procs
 	typealias CancelProc = () -> Void
@@ -19,7 +19,7 @@ struct ToggleableListSheet : View {
 	// MARK: Properties
 			var	body :some View {
 						NavigationView {
-							ToggleableList(self.toggleableWrappers, togglePlacement: self.togglePlacement)
+							ToggleableGrid(self.toggleableWrappers)
 								.navigationBarTitle(self.title, displayMode: .inline)
 								.if({ self.cancelProc != nil }()) { view in
 									view
@@ -44,7 +44,6 @@ struct ToggleableListSheet : View {
 
 	private	let	title :String
 	private	let	toggleableWrappers :[ToggleableWrapper]
-	private	let	togglePlacement :ToggleableView.TogglePlacement
 
 	private	let	confirmButtonTitle :String
 	private	let	confirmProc :ConfirmProc
@@ -57,14 +56,12 @@ struct ToggleableListSheet : View {
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ title :String, toggleables :[Toggleable],
-			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default,
-			confirmButtonTitle :String = "Confirm", confirmProc :@escaping ConfirmProc,
-			cancelButtonTitle :String = "Cancel", cancelProc :CancelProc? = nil) {
+	init(_ title :String, toggleables :[Toggleable], confirmButtonTitle :String = "Confirm",
+			confirmProc :@escaping ConfirmProc, cancelButtonTitle :String = "Cancel",
+			cancelProc :CancelProc? = nil) {
 		// Store
 		self.title = title
 		self.toggleableWrappers = toggleables.map({ ToggleableWrapper($0) })
-		self.togglePlacement = togglePlacement
 
 		self.confirmButtonTitle = confirmButtonTitle
 		self.confirmProc = confirmProc
@@ -85,8 +82,8 @@ struct ToggleableListSheet : View {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// MARK: ToggleableListSheet_Previews
-struct ToggleableListSheet_Previews : PreviewProvider {
+// MARK: ToggleableGridSheet_Previews
+struct ToggleableGridSheet_Previews : PreviewProvider {
 
 	// MARK: Properties
 	static	let	toggleables =
@@ -101,8 +98,7 @@ struct ToggleableListSheet_Previews : PreviewProvider {
 
 	static	var previews :some View {
 						VStack {
-							ToggleableListSheet("Title", toggleables: self.toggleables,
-									togglePlacement: .trailingCheckmarkCircle, confirmProc: {})
+							ToggleableGridSheet("Title", toggleables: self.toggleables, confirmProc: {})
 						}
 					}
 }

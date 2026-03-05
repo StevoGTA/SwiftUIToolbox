@@ -66,16 +66,4 @@ extension View {
 			Text(error.recoverySuggestion ?? "")
 		}
 	}
-
-//	@ViewBuilder
-//	func errorAlert(error: Binding<LocalizedError?>, buttonTitle: String = "OK") -> some View {
-////		let localizedAlertError = LocalizedAlertError(error: error.wrappedValue)
-//		alert(isPresented: .constant(error.wrappedValue != nil), error: error.wrappedValue) { _ in
-//			Button(buttonTitle) {
-//				error.wrappedValue = nil
-//			}
-//		} message: { error in
-//			Text(error.wrappedValue?.recoverySuggestion ?? "")
-//		}
-//	}
 }

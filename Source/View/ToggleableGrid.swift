@@ -1,16 +1,16 @@
 //
-//  ToggleableList.swift
+//  ToggleableGrid.swift
 //  SwiftUI Toolbox
 //
-//  Created by Stevo Brock on 3/15/25.
-//  Copyright © 2025 Stevo Brock. All rights reserved.
+//  Created by Stevo Brock on 3/5/25.
+//  Copyright © 2026 Stevo Brock. All rights reserved.
 //
 
 import SwiftUI
 
 //----------------------------------------------------------------------------------------------------------------------
-// MARK: ToggleableList
-struct ToggleableList : View {
+// MARK: ToggleableGrid
+struct ToggleableGrid : View {
 
 	// MARK: Properties
 			var	body :some View {
@@ -18,33 +18,30 @@ struct ToggleableList : View {
 							Text("\(self.activeToggleableWrappersCount) of \(self.toggleableWrappers.count) selected")
 								.font(.subheadline)
 								.foregroundStyle(.secondary)
-							List {
-								// Action buttons
-								HStack(spacing: 12.0) {
-									Button("None") { withAnimation(.smooth) { self.selectNone() } }
-										.buttonStyle(.bordered)
-										.disabled(!self.noneButtonEnabled)
 
-									Button("All") { withAnimation(.smooth) { self.selectAll() } }
-										.buttonStyle(.bordered)
-										.disabled(!self.allButtonEnabled)
-								}
-									.frame(maxWidth: .infinity, alignment: .center)
+							// Action buttons
+							HStack(spacing: 12.0) {
+								Button("None") { withAnimation(.smooth) { self.selectNone() } }
+									.buttonStyle(.bordered)
+									.disabled(!self.noneButtonEnabled)
 
-								// Content
-								Section {
+								Button("All") { withAnimation(.smooth) { self.selectAll() } }
+									.buttonStyle(.bordered)
+									.disabled(!self.allButtonEnabled)
+							}
+
+							ScrollView {
+								LazyVGrid(columns: [GridItem(.adaptive(minimum: 60.0))], spacing: 14.0) {
 									ForEach(self.toggleableWrappers, id: \.id) {
-										ToggleableView($0, togglePlacement: self.togglePlacement,
-												updateProc: { self.updateUI() })
+										ToggleableCard($0, updateProc: { self.updateUI() })
 									}
 								}
+									.padding()
 							}
-								.listStyle(.insetGrouped)
 						}
 					}
 
 	private	let	toggleableWrappers :[ToggleableWrapper]
-	private	let	togglePlacement :ToggleableView.TogglePlacement
 
 	@State
 	private	var	activeToggleableWrappersCount = 0
@@ -57,11 +54,9 @@ struct ToggleableList : View {
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleableWrappers :[ToggleableWrapper],
-			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default) {
+	init(_ toggleableWrappers :[ToggleableWrapper]) {
 		// Store
 		self.toggleableWrappers = toggleableWrappers
-		self.togglePlacement = togglePlacement
 
 		// Update UI
 		self._activeToggleableWrappersCount = State(initialValue: self.toggleableWrappers.filter({ $0.isActive }).count)
@@ -98,8 +93,8 @@ struct ToggleableList : View {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// MARK: ToggleableList_Previews
-struct ToggleableList_Previews : PreviewProvider {
+// MARK: ToggleableGrid_Previews
+struct ToggleableGrid_Previews : PreviewProvider {
 
 	// MARK: Properties
 	static	let	toggleables =
@@ -114,7 +109,7 @@ struct ToggleableList_Previews : PreviewProvider {
 
 	static	var previews :some View {
 						VStack {
-							ToggleableList(self.toggleables, togglePlacement: .trailingCheckmarkCircle)
+							ToggleableGrid(self.toggleables)
 						}
 					}
 }

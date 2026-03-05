@@ -33,53 +33,53 @@ struct ToggleableView : View {
 
 	// MARK: Properties
 			var	body :some View {
-								HStack {
-									// Leading placements
-									if self.togglePlacement == .leadingToggle {
-										// Toggle
-										Toggle("", isOn: self.$toggleableWrapper.isActive)
-											.fixedSize()
-											.onChange(of: self.toggleableWrapper.isActive) { self.updateProc() }
-										Spacer()
-									} else if self.togglePlacement == .leadingCheckmark {
-										// Checkmark
-										self.imageView
-										Spacer()
-									} else if self.togglePlacement == .leadingCheckmarkCircle {
-										// Checkmark Circle
-										self.imageView
-										Spacer()
-									}
-
-									// Text
-									Text("\(String(self.toggleableWrapper.toggleable.title))")
-
-									// Trailing placements
-									if self.togglePlacement == .trailingToggle {
-										// Toggle
-										Spacer()
-										Toggle("", isOn: self.$toggleableWrapper.isActive)
-											.fixedSize()
-											.onChange(of: self.toggleableWrapper.isActive) { self.updateProc() }
-									} else if self.togglePlacement == .trailingCheckmark {
-										// Checkmark
-										Spacer()
-										self.imageView
-									} else if self.togglePlacement == .trailingCheckmarkCircle {
-										// Checkmark Circle
-										Spacer()
-										self.imageView
-									}
-								}
-									.contentShape(Rectangle())
-									.onTapGesture {
-										// Toggle local state
-										self.toggleableWrapper.isActive.toggle()
-
-										// Call proc
-										self.updateProc()
-									}
+						HStack {
+							// Leading placements
+							if self.togglePlacement == .leadingToggle {
+								// Toggle
+								Toggle("", isOn: self.$toggleableWrapper.isActive)
+									.fixedSize()
+									.onChange(of: self.toggleableWrapper.isActive) { self.noteUpdated() }
+								Spacer()
+							} else if self.togglePlacement == .leadingCheckmark {
+								// Checkmark
+								self.imageView
+								Spacer()
+							} else if self.togglePlacement == .leadingCheckmarkCircle {
+								// Checkmark Circle
+								self.imageView
+								Spacer()
 							}
+
+							// Text
+							Text("\(String(self.toggleableWrapper.title))")
+
+							// Trailing placements
+							if self.togglePlacement == .trailingToggle {
+								// Toggle
+								Spacer()
+								Toggle("", isOn: self.$toggleableWrapper.isActive)
+									.fixedSize()
+									.onChange(of: self.toggleableWrapper.isActive) { self.noteUpdated() }
+							} else if self.togglePlacement == .trailingCheckmark {
+								// Checkmark
+								Spacer()
+								self.imageView
+							} else if self.togglePlacement == .trailingCheckmarkCircle {
+								// Checkmark Circle
+								Spacer()
+								self.imageView
+							}
+						}
+							.contentShape(Rectangle())
+							.onTapGesture {
+								// Toggle local state
+								self.toggleableWrapper.isActive.toggle()
+
+								// Call proc
+								self.noteUpdated()
+							}
+					}
 
 	@ObservedObject
 	private	var	toggleableWrapper :ToggleableWrapper
@@ -89,34 +89,26 @@ struct ToggleableView : View {
 	private	let	updateProc :UpdateProc
 
 	private	var	imageView :some View {
-					ZStack {
-						// Check toggle control
-						if (self.togglePlacement == .leadingCheckmark) ||
-								(self.togglePlacement == .trailingCheckmark) {
-							// Check mark
-							if self.toggleableWrapper.isActive {
-								// Currently active
+						ZStack {
+							// Check toggle control
+							if (self.togglePlacement == .leadingCheckmark) ||
+									(self.togglePlacement == .trailingCheckmark) {
+								// Check mark
 								Image(systemName: "checkmark")
-									.foregroundColor(.accentColor)
+									.foregroundStyle(self.toggleableWrapper.isActive ? Color.accentColor : .primary)
+									.opacity(self.toggleableWrapper.isActive ? 1.0 : 0.1)
+									.scaleEffect(self.toggleableWrapper.isActive ? 1 : 0.9)
+									.animation(.smooth(duration: 0.2), value: self.toggleableWrapper.isActive)
 							} else {
-								// Currently inactive
-								Image(systemName: "checkmark")
-									.opacity(0.10)
-							}
-						} else {
-							// Checkmark circle
-							if self.toggleableWrapper.isActive {
-								// Currently active
-								Image(systemName: "checkmark.circle")
-									.foregroundColor(.accentColor)
-							} else {
-								// Currently inactive
-								Image(systemName: "checkmark.circle")
-									.opacity(0.10)
+								// Checkmark circle
+								Image(systemName: self.toggleableWrapper.isActive ? "checkmark.circle.fill" : "circle")
+									.foregroundStyle(self.toggleableWrapper.isActive ? Color.accentColor : .primary)
+									.opacity(self.toggleableWrapper.isActive ? 1.0 : 0.1)
+									.scaleEffect(self.toggleableWrapper.isActive ? 1 : 0.9)
+									.animation(.smooth(duration: 0.2), value: self.toggleableWrapper.isActive)
 							}
 						}
 					}
-				}
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
@@ -127,6 +119,16 @@ struct ToggleableView : View {
 		self.togglePlacement = togglePlacement
 
 		self.updateProc = updateProc ?? {}
+	}
+
+	// MARK: Private methods
+	//------------------------------------------------------------------------------------------------------------------
+	private func noteUpdated() {
+		// Let's have some feedback!
+		UIImpactFeedbackGenerator(style: .light).impactOccurred()
+
+		// Call proc
+		self.updateProc()
 	}
 }
 
