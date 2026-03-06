@@ -19,7 +19,8 @@ struct ToggleableListSheet : View {
 	// MARK: Properties
 			var	body :some View {
 						NavigationView {
-							ToggleableList(self.toggleableWrappers, togglePlacement: self.togglePlacement)
+							ToggleableList(self.toggleableWrappers, togglePlacement: self.togglePlacement,
+									updatedProc: { self.updateUI() })
 								.navigationBarTitle(self.title, displayMode: .inline)
 								.if({ self.cancelProc != nil }()) { view in
 									view
@@ -29,7 +30,7 @@ struct ToggleableListSheet : View {
 												trailing:
 														Button(self.confirmButtonTitle) { self.confirm() }
 															.buttonStyle(.borderedProminent)
-															.disabled(!self.updateButtonEnabled))
+															.disabled(!self.confirmButtonEnabled))
 								}
 								.if({ self.cancelProc == nil }()) { view in
 									view
@@ -37,7 +38,7 @@ struct ToggleableListSheet : View {
 												trailing:
 														Button(self.confirmButtonTitle) { self.confirm() }
 															.buttonStyle(.borderedProminent)
-															.disabled(!self.updateButtonEnabled))
+															.disabled(!self.confirmButtonEnabled))
 								}
 						}
 					}
@@ -53,7 +54,7 @@ struct ToggleableListSheet : View {
 	private	let	cancelProc :CancelProc?
 
 	@State
-	private	var	updateButtonEnabled = true
+	private	var	confirmButtonEnabled = true
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
@@ -81,6 +82,13 @@ struct ToggleableListSheet : View {
 
 		// Call proc
 		self.confirmProc()
+	}
+
+	// MARK: Private methods
+	//------------------------------------------------------------------------------------------------------------------
+	private func updateUI() {
+		// Update
+		self.confirmButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
 	}
 }
 

@@ -46,6 +46,8 @@ struct ToggleableList : View {
 	private	let	toggleableWrappers :[ToggleableWrapper]
 	private	let	togglePlacement :ToggleableView.TogglePlacement
 
+	private	let	updatedProc :() -> Void
+
 	@State
 	private	var	activeToggleableWrappersCount = 0
 
@@ -58,10 +60,13 @@ struct ToggleableList : View {
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
 	init(_ toggleableWrappers :[ToggleableWrapper],
-			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default) {
+			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default,
+			updatedProc :@escaping () -> Void = {}) {
 		// Store
 		self.toggleableWrappers = toggleableWrappers
 		self.togglePlacement = togglePlacement
+
+		self.updatedProc = updatedProc
 
 		// Update UI
 		self._activeToggleableWrappersCount = State(initialValue: self.toggleableWrappers.filter({ $0.isActive }).count)
@@ -90,6 +95,9 @@ struct ToggleableList : View {
 
 	//------------------------------------------------------------------------------------------------------------------
 	private func updateUI() {
+		// Call proc
+		self.updatedProc()
+
 		// Update UI
 		self.activeToggleableWrappersCount = self.toggleableWrappers.filter({ $0.isActive }).count
 		self.noneButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
