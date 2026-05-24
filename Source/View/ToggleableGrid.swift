@@ -13,12 +13,17 @@ import SwiftUI
 struct ToggleableGrid : View {
 
 	// MARK: Properties
+			var	grid :some View {
+						LazyVGrid(columns: [GridItem(.adaptive(minimum: 60.0))], spacing: 14.0) {
+							ForEach(self.toggleables, id: \.id) {
+								ToggleableCard($0, updateProc: { self.updateUI() })
+							}
+						}
+							.padding()
+					}
+
 			var	body :some View {
 						VStack {
-							Text("\(self.activeToggleableWrappersCount) of \(self.toggleableWrappers.count) selected")
-								.font(.subheadline)
-								.foregroundStyle(.secondary)
-
 							// Action buttons
 							HStack(spacing: 12.0) {
 								Button("None") { withAnimation(.smooth) { self.selectNone() } }
@@ -30,23 +35,31 @@ struct ToggleableGrid : View {
 									.disabled(!self.allButtonEnabled)
 							}
 
-							ScrollView {
-								LazyVGrid(columns: [GridItem(.adaptive(minimum: 60.0))], spacing: 14.0) {
-									ForEach(self.toggleableWrappers, id: \.id) {
-										ToggleableCard($0, updateProc: { self.updateUI() })
-									}
+							// Content
+							if self.useScrollView {
+								// ScrolLView
+								ScrollView {
+									self.grid
 								}
-									.padding()
+							} else {
+								// Just the Grid
+								self.grid
 							}
+
+							// Informative Text
+							Text("\(self.activeToggleablesCount) of \(self.toggleables.count) selected")
+								.font(.subheadline)
+								.foregroundStyle(.secondary)
 						}
 					}
 
-	private	let	toggleableWrappers :[ToggleableWrapper]
+	private	let	toggleables :[Toggleable]
+	private	let	useScrollView :Bool
 
 	private	let	updatedProc :() -> Void
 
 	@State
-	private	var	activeToggleableWrappersCount = 0
+	private	var	activeToggleablesCount = 0
 
 	@State
 	private	var	noneButtonEnabled = true
@@ -56,23 +69,24 @@ struct ToggleableGrid : View {
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleableWrappers :[ToggleableWrapper], updatedProc :@escaping () -> Void = {}) {
+	init(_ toggleables :[Toggleable], useScrollView :Bool = true, updatedProc :@escaping () -> Void = {}) {
 		// Store
-		self.toggleableWrappers = toggleableWrappers
+		self.toggleables = toggleables
+		self.useScrollView = useScrollView
 
 		self.updatedProc = updatedProc
 
 		// Update UI
-		self._activeToggleableWrappersCount = State(initialValue: self.toggleableWrappers.filter({ $0.isActive }).count)
-		self._noneButtonEnabled = State(initialValue: self.toggleableWrappers.first(where: { $0.isActive }) != nil)
-		self._allButtonEnabled = State(initialValue: self.toggleableWrappers.first(where: { !$0.isActive }) != nil)
+		self._activeToggleablesCount = State(initialValue: self.toggleables.filter({ $0.isActive }).count)
+		self._noneButtonEnabled = State(initialValue: self.toggleables.first(where: { $0.isActive }) != nil)
+		self._allButtonEnabled = State(initialValue: self.toggleables.first(where: { !$0.isActive }) != nil)
 	}
 
 	// MARK: Private methods
 	//------------------------------------------------------------------------------------------------------------------
 	private func selectAll() {
 		// Update
-		self.toggleableWrappers.forEach() { $0.isActive = true }
+		self.toggleables.forEach() { $0.isActive = true }
 
 		// Update UI
 		updateUI()
@@ -81,7 +95,7 @@ struct ToggleableGrid : View {
 	//------------------------------------------------------------------------------------------------------------------
 	private func selectNone() {
 		// Update
-		self.toggleableWrappers.forEach() { $0.isActive = false }
+		self.toggleables.forEach() { $0.isActive = false }
 
 		// Update UI
 		updateUI()
@@ -93,9 +107,9 @@ struct ToggleableGrid : View {
 		self.updatedProc()
 
 		// Update UI
-		self.activeToggleableWrappersCount = self.toggleableWrappers.filter({ $0.isActive }).count
-		self.noneButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
-		self.allButtonEnabled = self.toggleableWrappers.first(where: { !$0.isActive }) != nil
+		self.activeToggleablesCount = self.toggleables.filter({ $0.isActive }).count
+		self.noneButtonEnabled = self.toggleables.first(where: { $0.isActive }) != nil
+		self.allButtonEnabled = self.toggleables.first(where: { !$0.isActive }) != nil
 	}
 }
 
@@ -106,12 +120,12 @@ struct ToggleableGrid_Previews : PreviewProvider {
 	// MARK: Properties
 	static	let	toggleables =
 					[
-						ToggleableWrapper(Toggleable(title: "One", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Two", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Three", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Four", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Five", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Six", isActive: false)),
+						Toggleable(title: "One", isActive: true),
+						Toggleable(title: "Two", isActive: false),
+						Toggleable(title: "Three", isActive: true),
+						Toggleable(title: "Four", isActive: false),
+						Toggleable(title: "Five", isActive: true),
+						Toggleable(title: "Six", isActive: false),
 					]
 
 	static	var previews :some View {

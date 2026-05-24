@@ -2,7 +2,7 @@
 //  Color+Extensions.swift
 //  SwiftUI Toolbox
 //
-//  Created by Stevo on 11/2/20.
+//  Created by Stevo Brock on 11/2/20.
 //  Copyright © 2020 Stevo Brock. All rights reserved.
 //
 
@@ -13,6 +13,7 @@ import SwiftUI
 extension Color {
 
 	// MARK: Lifecycle methods
+	//------------------------------------------------------------------------------------------------------------------
 	init(hex :UInt) {
 		// Setup
 		let	alpha = Double((hex >> 24) & 0xFF) / 0xFF

@@ -37,9 +37,9 @@ struct ToggleableView : View {
 							// Leading placements
 							if self.togglePlacement == .leadingToggle {
 								// Toggle
-								Toggle("", isOn: self.$toggleableWrapper.isActive)
+								Toggle("", isOn: self.$toggleable.isActive)
 									.fixedSize()
-									.onChange(of: self.toggleableWrapper.isActive) { self.noteUpdated() }
+									.onChange(of: self.toggleable.isActive) { self.noteUpdated() }
 								Spacer()
 							} else if self.togglePlacement == .leadingCheckmark {
 								// Checkmark
@@ -52,15 +52,15 @@ struct ToggleableView : View {
 							}
 
 							// Text
-							Text("\(String(self.toggleableWrapper.title))")
+							Text("\(String(self.toggleable.title))")
 
 							// Trailing placements
 							if self.togglePlacement == .trailingToggle {
 								// Toggle
 								Spacer()
-								Toggle("", isOn: self.$toggleableWrapper.isActive)
+								Toggle("", isOn: self.$toggleable.isActive)
 									.fixedSize()
-									.onChange(of: self.toggleableWrapper.isActive) { self.noteUpdated() }
+									.onChange(of: self.toggleable.isActive) { self.noteUpdated() }
 							} else if self.togglePlacement == .trailingCheckmark {
 								// Checkmark
 								Spacer()
@@ -74,7 +74,7 @@ struct ToggleableView : View {
 							.contentShape(Rectangle())
 							.onTapGesture {
 								// Toggle local state
-								self.toggleableWrapper.isActive.toggle()
+								self.toggleable.isActive.toggle()
 
 								// Call proc
 								self.noteUpdated()
@@ -82,7 +82,7 @@ struct ToggleableView : View {
 					}
 
 	@ObservedObject
-	private	var	toggleableWrapper :ToggleableWrapper
+	private	var	toggleable :Toggleable
 
 	private	let	togglePlacement :TogglePlacement
 
@@ -95,27 +95,27 @@ struct ToggleableView : View {
 									(self.togglePlacement == .trailingCheckmark) {
 								// Check mark
 								Image(systemName: "checkmark")
-									.foregroundStyle(self.toggleableWrapper.isActive ? Color.accentColor : .primary)
-									.opacity(self.toggleableWrapper.isActive ? 1.0 : 0.1)
-									.scaleEffect(self.toggleableWrapper.isActive ? 1 : 0.9)
-									.animation(.smooth(duration: 0.2), value: self.toggleableWrapper.isActive)
+									.foregroundStyle(self.toggleable.isActive ? Color.accentColor : .primary)
+									.opacity(self.toggleable.isActive ? 1.0 : 0.1)
+									.scaleEffect(self.toggleable.isActive ? 1 : 0.9)
+									.animation(.smooth(duration: 0.2), value: self.toggleable.isActive)
 							} else {
 								// Checkmark circle
-								Image(systemName: self.toggleableWrapper.isActive ? "checkmark.circle.fill" : "circle")
-									.foregroundStyle(self.toggleableWrapper.isActive ? Color.accentColor : .primary)
-									.opacity(self.toggleableWrapper.isActive ? 1.0 : 0.1)
-									.scaleEffect(self.toggleableWrapper.isActive ? 1 : 0.9)
-									.animation(.smooth(duration: 0.2), value: self.toggleableWrapper.isActive)
+								Image(systemName: self.toggleable.isActive ? "checkmark.circle.fill" : "circle")
+									.foregroundStyle(self.toggleable.isActive ? Color.accentColor : .primary)
+									.opacity(self.toggleable.isActive ? 1.0 : 0.1)
+									.scaleEffect(self.toggleable.isActive ? 1 : 0.9)
+									.animation(.smooth(duration: 0.2), value: self.toggleable.isActive)
 							}
 						}
 					}
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleableWrapper :ToggleableWrapper, togglePlacement :TogglePlacement = TogglePlacement.default,
+	init(_ toggleable :Toggleable, togglePlacement :TogglePlacement = TogglePlacement.default,
 			updateProc :UpdateProc? = nil) {
 		// Store
-		self.toggleableWrapper = toggleableWrapper
+		self.toggleable = toggleable
 		self.togglePlacement = togglePlacement
 
 		self.updateProc = updateProc ?? {}
@@ -137,24 +137,24 @@ struct ToggleableView : View {
 struct ToggleableView_Previews : PreviewProvider {
 
 	// MARK: Properties
-	static	let	toggleableWrappers :[ToggleableWrapper] =
+	static	let	toggleables :[Toggleable] =
 					[
-						ToggleableWrapper(Toggleable(title: "Sample 1", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Sample 2", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Sample 3", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Sample 4", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Sample 5", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Sample 6", isActive: true)),
+						Toggleable(title: "Sample 1", isActive: false),
+						Toggleable(title: "Sample 2", isActive: true),
+						Toggleable(title: "Sample 3", isActive: false),
+						Toggleable(title: "Sample 4", isActive: true),
+						Toggleable(title: "Sample 5", isActive: false),
+						Toggleable(title: "Sample 6", isActive: true),
 					]
 
 	static	var previews :some View {
 						List {
-							ToggleableView(self.toggleableWrappers[0], togglePlacement: .leadingToggle)
-							ToggleableView(self.toggleableWrappers[1], togglePlacement: .trailingToggle)
-							ToggleableView(self.toggleableWrappers[2], togglePlacement: .leadingCheckmark)
-							ToggleableView(self.toggleableWrappers[3], togglePlacement: .trailingCheckmark)
-							ToggleableView(self.toggleableWrappers[4], togglePlacement: .leadingCheckmarkCircle)
-							ToggleableView(self.toggleableWrappers[5], togglePlacement: .trailingCheckmarkCircle)
+							ToggleableView(self.toggleables[0], togglePlacement: .leadingToggle)
+							ToggleableView(self.toggleables[1], togglePlacement: .trailingToggle)
+							ToggleableView(self.toggleables[2], togglePlacement: .leadingCheckmark)
+							ToggleableView(self.toggleables[3], togglePlacement: .trailingCheckmark)
+							ToggleableView(self.toggleables[4], togglePlacement: .leadingCheckmarkCircle)
+							ToggleableView(self.toggleables[5], togglePlacement: .trailingCheckmarkCircle)
 						}
 							.padding()
 					}

@@ -18,8 +18,8 @@ struct ToggleableGridSheet : View {
 
 	// MARK: Properties
 			var	body :some View {
-						NavigationView {
-							ToggleableGrid(self.toggleableWrappers, updatedProc: { self.updateUI() })
+						NavigationStack {
+							ToggleableGrid(self.localToggleables, updatedProc: { self.updateUI() })
 								.navigationBarTitle(self.title, displayMode: .inline)
 								.if({ self.cancelProc != nil }()) { view in
 									view
@@ -43,7 +43,8 @@ struct ToggleableGridSheet : View {
 					}
 
 	private	let	title :String
-	private	let	toggleableWrappers :[ToggleableWrapper]
+	private	let	toggleables :[Toggleable]
+	private	let	localToggleables :[Toggleable]
 
 	private	let	confirmButtonTitle :String
 	private	let	confirmProc :ConfirmProc
@@ -61,20 +62,26 @@ struct ToggleableGridSheet : View {
 			cancelProc :CancelProc? = nil) {
 		// Store
 		self.title = title
-		self.toggleableWrappers = toggleables.map({ ToggleableWrapper($0) })
+		self.toggleables = toggleables
 
 		self.confirmButtonTitle = confirmButtonTitle
 		self.confirmProc = confirmProc
 
 		self.cancelButtonTitle = cancelButtonTitle
 		self.cancelProc = cancelProc
+
+		// Setup
+		self.localToggleables = toggleables.map({ Toggleable(title: $0.title, isActive: $0.isActive) })
 	}
 
 	// MARK: Private methods
 	//------------------------------------------------------------------------------------------------------------------
 	private func confirm() {
 		// Update toggleables
-		self.toggleableWrappers.forEach({ $0.commit() })
+		for index in 0..<self.toggleables.count {
+			// Update
+			self.toggleables[index].isActive = self.localToggleables[index].isActive
+		}
 
 		// Call proc
 		self.confirmProc()
@@ -84,7 +91,7 @@ struct ToggleableGridSheet : View {
 	//------------------------------------------------------------------------------------------------------------------
 	private func updateUI() {
 		// Update
-		self.confirmButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
+		self.confirmButtonEnabled = self.localToggleables.first(where: { $0.isActive }) != nil
 	}
 }
 

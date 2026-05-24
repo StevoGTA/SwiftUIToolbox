@@ -18,8 +18,8 @@ struct ToggleableListSheet : View {
 
 	// MARK: Properties
 			var	body :some View {
-						NavigationView {
-							ToggleableList(self.toggleableWrappers, togglePlacement: self.togglePlacement,
+						NavigationStack {
+							ToggleableList(self.localToggleables, togglePlacement: self.togglePlacement,
 									updatedProc: { self.updateUI() })
 								.navigationBarTitle(self.title, displayMode: .inline)
 								.if({ self.cancelProc != nil }()) { view in
@@ -44,7 +44,8 @@ struct ToggleableListSheet : View {
 					}
 
 	private	let	title :String
-	private	let	toggleableWrappers :[ToggleableWrapper]
+	private	let	toggleables :[Toggleable]
+	private	let	localToggleables :[Toggleable]
 	private	let	togglePlacement :ToggleableView.TogglePlacement
 
 	private	let	confirmButtonTitle :String
@@ -64,7 +65,7 @@ struct ToggleableListSheet : View {
 			cancelButtonTitle :String = "Cancel", cancelProc :CancelProc? = nil) {
 		// Store
 		self.title = title
-		self.toggleableWrappers = toggleables.map({ ToggleableWrapper($0) })
+		self.toggleables = toggleables
 		self.togglePlacement = togglePlacement
 
 		self.confirmButtonTitle = confirmButtonTitle
@@ -72,13 +73,19 @@ struct ToggleableListSheet : View {
 
 		self.cancelButtonTitle = cancelButtonTitle
 		self.cancelProc = cancelProc
+
+		// Setup
+		self.localToggleables = toggleables.map({ Toggleable(title: $0.title, isActive: $0.isActive) })
 	}
 
 	// MARK: Private methods
 	//------------------------------------------------------------------------------------------------------------------
 	private func confirm() {
 		// Update toggleables
-		self.toggleableWrappers.forEach({ $0.commit() })
+		for index in 0..<self.toggleables.count {
+			// Update
+			self.toggleables[index].isActive = self.localToggleables[index].isActive
+		}
 
 		// Call proc
 		self.confirmProc()
@@ -88,7 +95,7 @@ struct ToggleableListSheet : View {
 	//------------------------------------------------------------------------------------------------------------------
 	private func updateUI() {
 		// Update
-		self.confirmButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
+		self.confirmButtonEnabled = self.localToggleables.first(where: { $0.isActive }) != nil
 	}
 }
 

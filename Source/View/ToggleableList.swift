@@ -15,7 +15,7 @@ struct ToggleableList : View {
 	// MARK: Properties
 			var	body :some View {
 						VStack {
-							Text("\(self.activeToggleableWrappersCount) of \(self.toggleableWrappers.count) selected")
+							Text("\(self.activeToggleablesCount) of \(self.toggleables.count) selected")
 								.font(.subheadline)
 								.foregroundStyle(.secondary)
 							List {
@@ -33,7 +33,7 @@ struct ToggleableList : View {
 
 								// Content
 								Section {
-									ForEach(self.toggleableWrappers, id: \.id) {
+									ForEach(self.toggleables, id: \.id) {
 										ToggleableView($0, togglePlacement: self.togglePlacement,
 												updateProc: { self.updateUI() })
 									}
@@ -43,13 +43,13 @@ struct ToggleableList : View {
 						}
 					}
 
-	private	let	toggleableWrappers :[ToggleableWrapper]
+	private	let	toggleables :[Toggleable]
 	private	let	togglePlacement :ToggleableView.TogglePlacement
 
 	private	let	updatedProc :() -> Void
 
 	@State
-	private	var	activeToggleableWrappersCount = 0
+	private	var	activeToggleablesCount = 0
 
 	@State
 	private	var	noneButtonEnabled = true
@@ -59,26 +59,26 @@ struct ToggleableList : View {
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleableWrappers :[ToggleableWrapper],
+	init(_ toggleables :[Toggleable],
 			togglePlacement :ToggleableView.TogglePlacement = ToggleableView.TogglePlacement.default,
 			updatedProc :@escaping () -> Void = {}) {
 		// Store
-		self.toggleableWrappers = toggleableWrappers
+		self.toggleables = toggleables
 		self.togglePlacement = togglePlacement
 
 		self.updatedProc = updatedProc
 
 		// Update UI
-		self._activeToggleableWrappersCount = State(initialValue: self.toggleableWrappers.filter({ $0.isActive }).count)
-		self._noneButtonEnabled = State(initialValue: self.toggleableWrappers.first(where: { $0.isActive }) != nil)
-		self._allButtonEnabled = State(initialValue: self.toggleableWrappers.first(where: { !$0.isActive }) != nil)
+		self._activeToggleablesCount = State(initialValue: self.toggleables.filter({ $0.isActive }).count)
+		self._noneButtonEnabled = State(initialValue: self.toggleables.first(where: { $0.isActive }) != nil)
+		self._allButtonEnabled = State(initialValue: self.toggleables.first(where: { !$0.isActive }) != nil)
 	}
 
 	// MARK: Private methods
 	//------------------------------------------------------------------------------------------------------------------
 	private func selectAll() {
 		// Update
-		self.toggleableWrappers.forEach() { $0.isActive = true }
+		self.toggleables.forEach() { $0.isActive = true }
 
 		// Update UI
 		updateUI()
@@ -87,7 +87,7 @@ struct ToggleableList : View {
 	//------------------------------------------------------------------------------------------------------------------
 	private func selectNone() {
 		// Update
-		self.toggleableWrappers.forEach() { $0.isActive = false }
+		self.toggleables.forEach() { $0.isActive = false }
 
 		// Update UI
 		updateUI()
@@ -99,9 +99,9 @@ struct ToggleableList : View {
 		self.updatedProc()
 
 		// Update UI
-		self.activeToggleableWrappersCount = self.toggleableWrappers.filter({ $0.isActive }).count
-		self.noneButtonEnabled = self.toggleableWrappers.first(where: { $0.isActive }) != nil
-		self.allButtonEnabled = self.toggleableWrappers.first(where: { !$0.isActive }) != nil
+		self.activeToggleablesCount = self.toggleables.filter({ $0.isActive }).count
+		self.noneButtonEnabled = self.toggleables.first(where: { $0.isActive }) != nil
+		self.allButtonEnabled = self.toggleables.first(where: { !$0.isActive }) != nil
 	}
 }
 
@@ -112,12 +112,12 @@ struct ToggleableList_Previews : PreviewProvider {
 	// MARK: Properties
 	static	let	toggleables =
 					[
-						ToggleableWrapper(Toggleable(title: "One", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Two", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Three", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Four", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Five", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Six", isActive: false)),
+						Toggleable(title: "One", isActive: true),
+						Toggleable(title: "Two", isActive: false),
+						Toggleable(title: "Three", isActive: true),
+						Toggleable(title: "Four", isActive: false),
+						Toggleable(title: "Five", isActive: true),
+						Toggleable(title: "Six", isActive: false),
 					]
 
 	static	var previews :some View {

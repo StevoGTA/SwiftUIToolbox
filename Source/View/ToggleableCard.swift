@@ -17,21 +17,21 @@ struct ToggleableCard : View {
 
 	// MARK: Properties
 			var	body :some View {
-						Text("\(String(self.toggleableWrapper.title))")
+						Text("\(String(self.toggleable.title))")
 							.padding()
 							.frame(maxWidth: .infinity)
-							.background(self.toggleableWrapper.isActive ? Color.accentColor : Color(.systemGray5))
-							.foregroundStyle(self.toggleableWrapper.isActive ? Color.white : Color.primary)
+							.background(self.toggleable.isActive ? Color.accentColor : Color(.systemGray5))
+							.foregroundStyle(self.toggleable.isActive ? Color.white : Color.primary)
 							.overlay(
 								RoundedRectangle(cornerRadius: 12.0)
-									.strokeBorder(self.toggleableWrapper.isActive ? Color.white : Color.clear,
+									.strokeBorder(self.toggleable.isActive ? Color.white : Color.clear,
 											lineWidth: 2.0)
 								)
 							.clipShape(RoundedRectangle(cornerRadius: 12.0))
 							.onTapGesture {
 								// Toggle local state
 								withAnimation {
-									self.toggleableWrapper.isActive.toggle()
+									self.toggleable.isActive.toggle()
 								}
 
 								// Call proc
@@ -40,15 +40,15 @@ struct ToggleableCard : View {
 					}
 
 	@ObservedObject
-	private	var	toggleableWrapper :ToggleableWrapper
+	private	var	toggleable :Toggleable
 
 	private	let	updateProc :UpdateProc
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
-	init(_ toggleableWrapper :ToggleableWrapper, updateProc :UpdateProc? = nil) {
+	init(_ toggleable :Toggleable, updateProc :UpdateProc? = nil) {
 		// Store
-		self.toggleableWrapper = toggleableWrapper
+		self.toggleable = toggleable
 
 		self.updateProc = updateProc ?? {}
 	}
@@ -69,19 +69,19 @@ struct ToggleableCard : View {
 struct ToggleableCard_Previews : PreviewProvider {
 
 	// MARK: Properties
-	static	let	toggleableWrappers :[ToggleableWrapper] =
+	static	let	toggleables :[Toggleable] =
 					[
-						ToggleableWrapper(Toggleable(title: "Sample 1", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Sample 2", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Sample 3", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Sample 4", isActive: true)),
-						ToggleableWrapper(Toggleable(title: "Sample 5", isActive: false)),
-						ToggleableWrapper(Toggleable(title: "Sample 6", isActive: true)),
+						Toggleable(title: "Sample 1", isActive: false),
+						Toggleable(title: "Sample 2", isActive: true),
+						Toggleable(title: "Sample 3", isActive: false),
+						Toggleable(title: "Sample 4", isActive: true),
+						Toggleable(title: "Sample 5", isActive: false),
+						Toggleable(title: "Sample 6", isActive: true),
 					]
 
 	static	var previews :some View {
 						List {
-							ForEach(self.toggleableWrappers) {
+							ForEach(self.toggleables) {
 								ToggleableCard($0)
 							}
 						}
