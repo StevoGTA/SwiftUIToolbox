@@ -125,7 +125,9 @@ struct ToggleableView : View {
 	//------------------------------------------------------------------------------------------------------------------
 	private func noteUpdated() {
 		// Let's have some feedback!
+#if os(iOS)
 		UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
 
 		// Call proc
 		self.updateProc()
