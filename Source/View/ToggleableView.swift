@@ -52,7 +52,7 @@ struct ToggleableView : View {
 							}
 
 							// Text
-							Text("\(String(self.toggleable.title))")
+							Text(self.toggleable.title)
 
 							// Trailing placements
 							if self.togglePlacement == .trailingToggle {

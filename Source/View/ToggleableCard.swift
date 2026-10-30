@@ -17,7 +17,7 @@ struct ToggleableCard : View {
 
 	// MARK: Properties
 			var	body :some View {
-						Text("\(String(self.toggleable.title))")
+						Text(self.toggleable.title)
 							.padding()
 							.frame(maxWidth: .infinity)
 							.background(self.toggleable.isActive ? Color.accentColor : Color(.systemGray5))

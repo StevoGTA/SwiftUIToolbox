@@ -60,6 +60,6 @@ struct RoundedCornersShape : Shape {
 				startAngle: Angle(degrees: 180.0), endAngle: Angle(degrees: 270.0), clockwise: false)
 		path.addLine(to: CGPoint(x: width / 2.0, y: 0.0))
 
-		return path
+		return path.offsetBy(dx: rect.minX, dy: rect.minY)
 	}
 }
