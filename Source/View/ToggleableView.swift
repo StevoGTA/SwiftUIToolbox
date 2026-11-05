@@ -37,9 +37,8 @@ struct ToggleableView : View {
 							// Leading placements
 							if self.togglePlacement == .leadingToggle {
 								// Toggle
-								Toggle("", isOn: self.$toggleable.isActive)
+								Toggle("", isOn: self.isActiveBinding)
 									.fixedSize()
-									.onChange(of: self.toggleable.isActive) { self.noteUpdated() }
 								Spacer()
 							} else if self.togglePlacement == .leadingCheckmark {
 								// Checkmark
@@ -58,9 +57,8 @@ struct ToggleableView : View {
 							if self.togglePlacement == .trailingToggle {
 								// Toggle
 								Spacer()
-								Toggle("", isOn: self.$toggleable.isActive)
+								Toggle("", isOn: self.isActiveBinding)
 									.fixedSize()
-									.onChange(of: self.toggleable.isActive) { self.noteUpdated() }
 							} else if self.togglePlacement == .trailingCheckmark {
 								// Checkmark
 								Spacer()
@@ -108,6 +106,11 @@ struct ToggleableView : View {
 									.animation(.smooth(duration: 0.2), value: self.toggleable.isActive)
 							}
 						}
+					}
+
+	private	var	isActiveBinding :Binding<Bool> {
+						Binding(get: { self.toggleable.isActive },
+								set: { self.toggleable.isActive = $0; self.noteUpdated() })
 					}
 
 	// MARK: Lifecycle methods

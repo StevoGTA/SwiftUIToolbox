@@ -13,19 +13,21 @@ import SwiftUI
 fileprivate struct LocalizedAlertError : LocalizedError {
 
 	// MARK: Properties
-	let	localizedError :LocalizedError
+	let	error :Error
 
-	var	errorDescription :String? { self.localizedError.errorDescription }
-	var	recoverySuggestion :String? { self.localizedError.recoverySuggestion }
+	var	errorDescription :String? {
+				(self.error as? LocalizedError)?.errorDescription ?? self.error.localizedDescription
+			}
+	var	recoverySuggestion :String? { (self.error as? LocalizedError)?.recoverySuggestion }
 
 	// MARK: Lifecycle methods
 	//------------------------------------------------------------------------------------------------------------------
 	init?(error :Error?) {
 		// Validate
-		guard let localizedError = error as? LocalizedError else { return nil }
+		guard let error else { return nil }
 
 		// Store
-		self.localizedError = localizedError
+		self.error = error
 	}
 }
 
@@ -60,7 +62,8 @@ extension View {
 		// Setup
 		let	localizedAlertError = LocalizedAlertError(error: error.wrappedValue)
 
-		alert(isPresented: .constant(localizedAlertError != nil), error: localizedAlertError) { _ in
+		alert(isPresented: Binding(get: { error.wrappedValue != nil }, set: { if !$0 { error.wrappedValue = nil } }),
+				error: localizedAlertError) { _ in
 			Button(buttonTitle) { error.wrappedValue = nil }
 		} message: { error in
 			Text(error.recoverySuggestion ?? "")
